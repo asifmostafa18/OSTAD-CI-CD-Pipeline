@@ -1,0 +1,14 @@
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Start Application
+        run: |
+          pm2 stop app || true
+          pm2 start index.js --name "node-app"
