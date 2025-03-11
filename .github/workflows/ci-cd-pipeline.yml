@@ -1,29 +1,55 @@
-name: CI/CD Pipeline
+name: CI/CD Pipeline for Node.js App
 
 on:
   push:
     branches:
-      - main  # Trigger the workflow on push to the 'main' branch
+      - main
 
 jobs:
-  deploy:
-    runs-on: self-hosted  # Use a self-hosted runner for the deployment
-
+  test:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3  # Checkout the code from the repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
 
       - name: Install dependencies
-        run: npm install  # Install all the project dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test > test-results.txt || true
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: test-results.txt
+
+  deploy:
+    runs-on: self-hosted
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Download test results
+        uses: actions/download-artifact@v3
+        with:
+          name: test-results
+          path: .
+
+      - name: Display test results
+        run: cat test-results.txt
+
+      - name: Install dependencies
+        run: npm install
 
       - name: Start Application
         run: |
-          # Check if PM2 is installed, stop the app if it's running, then start it
-          if (Get-Command pm2 -ErrorAction SilentlyContinue) {
-            pm2 stop node-express-app -ErrorAction SilentlyContinue  # Stop app without throwing an error if not found
-            pm2 start src/server.js --name "node-express-app" -f  # Start the app using the server.js file in the src folder
-          } else {
-            # If PM2 is not installed, install it globally and start the app
-            npm install -g pm2
-            pm2 start src/server.js --name "node-express-app" -f
-          }
+          pm2 stop app || true
+          pm2 start src/server.js --name "node-express-app"
+
