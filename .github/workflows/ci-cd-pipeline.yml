@@ -21,9 +21,9 @@ jobs:
           # Check if PM2 is installed, stop the app if it's running, then start it
           if (Get-Command pm2 -ErrorAction SilentlyContinue) {
             pm2 stop node-express-app -ErrorAction SilentlyContinue  # Stop app without throwing an error if not found
-            pm2 start src/server.js --name "node-express-app"  # Start the app using the server.js file in the src folder
+            pm2 start src/server.js --name "node-express-app" -f  # Start the app using the server.js file in the src folder
           } else {
             # If PM2 is not installed, install it globally and start the app
             npm install -g pm2
-            pm2 start src/server.js --name "node-express-app"
+            pm2 start src/server.js --name "node-express-app" -f
           }
