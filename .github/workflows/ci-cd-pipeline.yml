@@ -50,6 +50,6 @@ jobs:
 
       - name: Start Application
         run: |
-          pm2 stop app || true
+          pm2 stop node-express-app
           pm2 start src/server.js --name "node-express-app"
 
