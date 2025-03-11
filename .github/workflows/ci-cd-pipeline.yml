@@ -26,7 +26,7 @@ jobs:
           # Check if PM2 is installed, stop the app if it's running, then start it
           if (Get-Command pm2 -ErrorAction SilentlyContinue) {
             pm2 stop app -ErrorAction SilentlyContinue  # Stop app without throwing an error if not found
-            pm2 start index.js --name "node-app"
+            pm2 start main.tsx --name "node-app"
           } else {
             echo "PM2 is not installed"
           }
