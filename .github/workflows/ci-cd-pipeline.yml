@@ -3,30 +3,27 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - main
+      - main  # Trigger the workflow on push to the 'main' branch
 
 jobs:
   deploy:
-    runs-on: self-hosted  # Ensure you have a self-hosted runner set up
+    runs-on: self-hosted  # Use a self-hosted runner for the deployment
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3  # Checkout the code from the repository
 
       - name: Install dependencies
-        run: npm install
-
-      - name: Install PM2 globally
-        run: |
-          npm install -g pm2
-          pm2 -v  # Verify if PM2 is installed
+        run: npm install  # Install all the project dependencies
 
       - name: Start Application
         run: |
           # Check if PM2 is installed, stop the app if it's running, then start it
           if (Get-Command pm2 -ErrorAction SilentlyContinue) {
-            pm2 stop app -ErrorAction SilentlyContinue  # Stop app without throwing an error if not found
-            pm2 start main.tsx --name "node-app"
+            pm2 stop node-express-app -ErrorAction SilentlyContinue  # Stop app without throwing an error if not found
+            pm2 start src/server.js --name "node-express-app"  # Start the app using the server.js file in the src folder
           } else {
-            echo "PM2 is not installed"
+            # If PM2 is not installed, install it globally and start the app
+            npm install -g pm2
+            pm2 start src/server.js --name "node-express-app"
           }
