@@ -21,7 +21,7 @@ jobs:
         run: npm install
 
       - name: Run tests
-        run: npm test > test-results.txt || true
+        run: npm run check > test-results.txt || true
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
