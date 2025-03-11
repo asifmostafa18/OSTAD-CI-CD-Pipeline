@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
+
 jobs:
   deploy:
-    runs-on: self-hosted
+    runs-on: self-hosted  # Ensure you have a self-hosted runner set up
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -14,7 +16,17 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Install PM2 globally
+        run: |
+          npm install -g pm2
+          pm2 -v  # Verify if PM2 is installed
+
       - name: Start Application
         run: |
-          pm2 stop app || true
-          pm2 start index.js --name "node-app"
+          # Check if PM2 is installed, stop the app if it's running, then start it
+          if (Get-Command pm2 -ErrorAction SilentlyContinue) {
+            pm2 stop app -ErrorAction SilentlyContinue  # Stop app without throwing an error if not found
+            pm2 start index.js --name "node-app"
+          } else {
+            echo "PM2 is not installed"
+          }
